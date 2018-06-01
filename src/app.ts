@@ -7,17 +7,15 @@ const app = Express();
 const port = 5010;
 
 
-app.get('/', (req, res, next) =>
+app.get('/', (req, res) =>
 {
     res.json({name: "Empresa"});
 });
 
-// Requests to "web_page/user" are handled by userRoute
-app.use('/user', userRoute);
+// Requests to "web_page/api/user" are handled by userRoute
+app.use('/api/user', userRoute);
 
 app.listen(port, () =>
 {
     console.log("App is listening");
 });
-
-export {app};
