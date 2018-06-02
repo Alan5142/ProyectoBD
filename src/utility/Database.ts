@@ -1,13 +1,13 @@
 import * as Postgres from 'pg';
 
 const database = new Postgres.Client({ // TODO set database login info
-    user: 'dbuser',
-    host: 'database.server.com',
-    database: 'mydb',
-    password: 'secretpassword',
-    port: 3211,
+    user: 'ProyectoBD',
+    host: 'localhost',
+    database: 'pbd',
+    password: 'Stark-Alan',
+    port: 5432,
 });
 
 database.connect();
-
+console.log("Se conecto a la bd");
 export { database }
