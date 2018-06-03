@@ -1,7 +1,7 @@
 import * as Postgres from 'pg';
 
 const database = new Postgres.Client({ // TODO set database login info
-    user: 'ProyectoBD',
+	user : 'Pbd',
     host: 'localhost',
     database: 'pbd',
     password: 'Stark-Alan',
