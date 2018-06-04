@@ -1,13 +1,15 @@
 "use strict";
 
+
 import * as Express from "express";
 import {userRoute} from './api/routes/User';
+import * as Models from './utility/models'
 
 const app = Express();
 const port = 5050;
 const host = '0.0.0.0';
 const bodyParser = require('body-parser');
-
+Models.Software.findById()
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 

@@ -1,13 +1,19 @@
-import * as Postgres from 'pg';
+import * as Sequelize from 'sequelize';
 
-const database = new Postgres.Client({ // TODO set database login info
-	user : 'Pbd',
-    host: 'localhost',
-    database: 'pbd',
-    password: 'Stark-Alan',
-    port: 5432,
+export const sequelize = new Sequelize('proyectobd', 'Pbd', 'Stark-Alan', {
+	host : 'localhost',
+	dialect : 'postgres',
+	operatorsAliases : false,
+
+	pool : {
+		max : 5,
+		min : 0,
+		acquire : 30000,
+		idle : 10000
+	},
+	define : {
+		timestamps : false
+	}
 });
 
-database.connect();
-console.log("Se conecto a la bd");
-export { database }
+export {Sequelize};

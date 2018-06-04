@@ -1,4 +1,3 @@
-"use strict";
 import * as Express from 'express';
 
 const route = Express.Router();
@@ -10,7 +9,7 @@ route.get('/', (req, res) =>
 
 route.post('/', (req, res) =>
 {
-	// TODO handle login
+
 });
 
 route.get('/:userid', (req, res) =>
