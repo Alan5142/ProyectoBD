@@ -7,6 +7,7 @@
         "sourceMap": true,
         "watch": true,
         "outDir": "build",
+      "moduleResolution": "node",
         "baseUrl": "./src",
         "paths": {
             "@utility/*": [

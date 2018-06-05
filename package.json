@@ -9,7 +9,9 @@
   "author": "Alan Ramírez Herrera, Jorge Esteban Sanchez Vidrio",
   "license": "ISC",
   "devDependencies": {
+    "@types/jsonwebtoken": "^7.2.7",
     "@types/node": "^10.1.2",
+    "jsonwebtoken": "^8.2.2",
     "tsconfig-paths": "^3.3.2"
   },
   "dependencies": {
@@ -19,7 +21,6 @@
     "express": "^4.16.3",
     "pg": "^7.4.3",
     "sequelize": "^4.37.10",
-    "ts-node": "file:ts-node",
     "typescript": "^2.9.1"
   }
 }

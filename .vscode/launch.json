@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Iniciar",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/build/app.js",
+      "stopOnEntry": false,
+      "cwd": "${workspaceRoot}",
+      "preLaunchTask": null,
+      "runtimeExecutable": null,
+      "runtimeArgs": [
+        "-r",
+        "tsconfig-paths/register"
+      ],
+      "args": [
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "externalConsole": false,
+      "sourceMaps": true,
+      "outDir": "${workspaceRoot}/build"
+    },
+    {
+      "name": "Asociar",
+      "type": "node",
+      "request": "attach",
+      "port": 5858,
+      "address": "localhost",
+      "restart": false,
+      "sourceMaps": false,
+      "outDir": null,
+      "localRoot": "${workspaceRoot}",
+      "remoteRoot": null
+    },
+    {
+      "name": "Asociar al proceso",
+      "type": "node",
+      "request": "attach",
+      "processId": "${command.PickProcess}",
+      "port": 5858,
+      "sourceMaps": false,
+      "outDir": null
+    }
+  ]
+}
