@@ -31,7 +31,7 @@ export const CanceladosTarde = sequelize.define('canceladosTarde', {
 	Software : Sequelize.SMALLINT
 });
 
-Software.hasOne(CanceladosTarde, {foreignKey : 'Software'})
+Software.hasOne(CanceladosTarde, {foreignKey : 'Software'});
 
 export const Desarrollo = sequelize.define('desarrollo', {
 	Clave_desarrollo :
@@ -59,7 +59,7 @@ export const Empleado = sequelize.define('empleado', {
 });
 
 Empleado.hasMany(Desarrollo, {foreignKey : 'Empleado'});
-Software.hasMany(Desarrollo, {foreignKey : 'Software'})
+Software.hasMany(Desarrollo, {foreignKey : 'Software'});
 
 export const PerfilesPasados = sequelize.define('perfiles_pasados', {
 	Clave :
@@ -99,7 +99,7 @@ export const Imagen = sequelize.define('imagenes', {
 	Perfil : Sequelize.INTEGER
 });
 
-Perfil.hasMany(Imagen, {foreignKey : 'Perfil'});
+Perfil.hasMany(Imagen, {foreignKey : 'Perfile'});
 
 export const EntradaSalida = sequelize.define('entrada_salida', {
 	Clave_Registro :
@@ -114,4 +114,22 @@ export const EntradaSalida = sequelize.define('entrada_salida', {
 
 Perfil.hasMany(EntradaSalida, {foreignKey : 'Perfil'});
 
-sequelize.sync({force : true});
+export const Tokens = sequelize.define('tokens',
+	{
+		refreshToken :
+			{
+				type : Sequelize.TEXT,
+				primaryKey : true
+			},
+		token :
+			{
+				type : Sequelize.TEXT,
+				unique : true
+			},
+		expiration :
+			{
+				type : Sequelize.DATE
+			}
+	});
+
+sequelize.sync({force : false});
