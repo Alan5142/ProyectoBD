@@ -47,7 +47,7 @@ route.use("/", (req, res, next) =>
 route.get("/", (req, res) =>
 {
 	// TODO Stark, ¿todos los empleados tienen permiso de ver quienes hacen que cosa en los desarrollos?
-	const getDesarrollos = (desarrollo: IDesarrolloInstance[]) =>
+	const getDesarrollos = (desarrollo: Modelos.IDesarrolloInstance[]) =>
 	{
 		let result = [];
 		res.status(200).json(
