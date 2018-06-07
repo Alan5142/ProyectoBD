@@ -1,21 +1,16 @@
 {
-    "compilerOptions": {
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "module": "commonjs",
-        "target": "es2015",
-        "sourceMap": true,
-        "watch": true,
-        "outDir": "build",
-      "moduleResolution": "node",
-        "baseUrl": "./src",
-        "paths": {
-            "@utility/*": [
-                "utility/*"
-            ]
-        }
-    },
-    "exclude": [
-        "node_modules"
-    ]
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"module": "commonjs",
+		"target": "es2015",
+		"sourceMap": true,
+		"watch": true,
+		"outDir": "build",
+		"moduleResolution": "node"
+	}
+},
+"exclude": [
+"node_modules"
+]
 }

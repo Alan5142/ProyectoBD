@@ -1,5 +1,5 @@
 {
-  "dependencies": {
-    "hapi": "registry:dt/hapi#16.0.0+20170125175540"
-  }
+	"dependencies": {
+		"hapi": "registry:dt/hapi#16.0.0+20170125175540"
+	}
 }
