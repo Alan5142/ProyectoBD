@@ -1,60 +1,26 @@
 import * as Express from "express";
-import * as Jwt     from "jsonwebtoken";
 import * as Modelos from "../../utility/models";
 
-const config = require("./../../../config.json");
-
 const route = Express.Router();
-
-route.use("/", (req, res, next) =>
-{
-	const token = req.body.token || req.query.token || req.headers["token"];
-	
-	if (!token)
-	{
-		res.status(401).json(
-			{
-				message: "Unauthorized"
-			}
-		)
-		return;
-	}
-	Jwt.verify(token, config.secret, (err, decoded) =>
-	{
-		if (!err)
-		{
-			req.body.decodedToken = decoded;
-			next();
-			return;
-		}
-		if (err.name === "Jwt.TokenExpiredError")
-		{
-			res.status(401).json(
-				{
-					Mensaje: "Token expirado"
-				}
-			);
-			return;
-		}
-		res.status(401).json(
-			{
-				Mensaje: "Acceso no autorizado"
-			}
-		)
-	});
-});
 
 route.get("/", (req, res) =>
 {
 	const decodedToken = req.body.decodedToken;
-	
+	if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador")
+	{
+		return res.status(401).json(
+			{
+				mensaje : "Acceso no autorizado"
+			}
+		);
+	}
 	// TODO Stark, ¿todos los empleados tienen permiso de ver quienes hacen que cosa en los desarrollos?
-	const getDesarrollos = (desarrollo: Modelos.IDesarrolloInstance[]) =>
+	const getDesarrollos = (desarrollo : Modelos.IDesarrolloInstance[]) =>
 	{
 		res.status(200).json(
 			{
-				message: "OK",
-				desarrollos: desarrollo
+				message : "OK",
+				desarrollos : desarrollo
 			}
 		);
 	};
@@ -63,20 +29,39 @@ route.get("/", (req, res) =>
 
 route.get("/:idDesarrollo", (req, res) =>
 {
-	const obtenerDesarrolloConId = (desarrollo: Modelos.IDesarrolloInstance) =>
+	const decodedToken = req.body.decodedToken;
+
+
+	const obtenerDesarrolloConId = (desarrollo : Modelos.IDesarrolloInstance) =>
 	{
+		if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador" || desarrollo.Empleado !== decodedToken.numUsuario)
+		{
+			return res.status(401).json(
+				{
+					mensaje : "Acceso no autorizado"
+				}
+			);
+		}
+		if (!desarrollo)
+		{
+			return res.status(404).json(
+				{
+					mensaje : "No encontrado"
+				}
+			)
+		}
 		return res.status(200).json(
 			{
-				mensaje: "OK",
-				desarrollo: desarrollo
+				mensaje : "OK",
+				desarrollo : desarrollo
 			}
 		)
-	}
+	};
 	Modelos.Desarrollo.findOne(
 		{
-			where:
+			where :
 				{
-					Clave_desarrollo: req.params.idDesarrollo
+					Clave_desarrollo : req.params.idDesarrollo
 				}
 		}
 	).then(obtenerDesarrolloConId);
@@ -89,62 +74,76 @@ route.post("/", (req, res) =>
 	{
 		return res.status(401).json(
 			{
-				mensaje: "No tienes permiso de hacer esto"
+				mensaje : "No tienes permiso de hacer esto"
 			}
 		)
 	}
-	
+
 	const desarrolloAInsertar = req.body.desarrollo;
-	
+
 	if (!desarrolloAInsertar)
 	{
 		return res.status(400).json(
 			{
-				mensaje: "Debes dar los datos para el nuevo desarrollo"
+				mensaje : "Debes dar los datos para el nuevo desarrollo"
 			}
 		);
 	}
-	
+
 	Modelos.Desarrollo.create(
 		{
-			Clave_desarrollo: 10,
-			Tarea: desarrolloAInsertar.tarea,
-			Fecha_Inicio: desarrolloAInsertar.fechaInicio,
-			Fecha_Termino: desarrolloAInsertar.fechaTermino,
-			Software: desarrolloAInsertar.software, // son generados por el frontend
-			Empleado: desarrolloAInsertar.empleado
+			Clave_desarrollo : 10,
+			Tarea : desarrolloAInsertar.tarea,
+			Fecha_Inicio : desarrolloAInsertar.fechaInicio,
+			Fecha_Termino : desarrolloAInsertar.fechaTermino,
+			Software : desarrolloAInsertar.software, // son generados por el frontend
+			Empleado : desarrolloAInsertar.empleado
 		}
 	)
 
 });
 
-route.delete("/", (req, res) =>
+route.delete("/:idDesarrollo", (req, res) =>
 {
-	// TODO ¿quién puede eliminar de la tabla desarrollo?
-	if (req.body.decodedToken.Puesto !== "Gerente")
+	if (req.body.decodedToken.Puesto !== "Supervisor" || req.body.decodedToken.Puesto !== "Administrador")
 	{
 		return res.status(401).json(
 			{
-				mensaje: "No tienes permiso de hacer esto"
+				mensaje : "No tienes permiso de hacer esto"
 			}
 		)
 	}
-	if (!req.body.idDesarrollo)
+	if (!req.params.idDesarrollo)
 	{
 		return res.status(500).json(
 			{
-				message: "Desarrollo no existe"
+				message : "Debes brindar un id"
 			}
 		)
 	}
+
 	Modelos.Desarrollo.destroy(
 		{
-			where:
+			where :
 				{
-					Clave_desarrollo: req.body.idDesarrollo
+					Clave_desarrollo : req.body.idDesarrollo
 				}
 		}
-	)
+	).then(softwareEliminado =>
+	{
+		res.json(200).json(
+			{
+				mensaje : "OK"
+			}
+		)
+	}, error =>
+	{
+		res.json(500).json(
+			{
+				mensaje : "No se pudo eliminar"
+			}
+		)
+	})
 });
 
-export {route as developRoute};
+export {route as desarrolloRoute};

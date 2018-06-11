@@ -1,81 +1,187 @@
-import * as Express          from "express";
-import * as Jwt              from "jsonwebtoken";
-import * as Modelos          from "../../utility/models";
-import {IDesarrolloInstance} from "../../utility/models";
-
-const config = require("./../../../config.json");
+import * as Express from "express";
+import * as Modelos from "../../utility/models";
 
 const route = Express.Router();
+const privateRoute = Express.Router();
 
-route.use("/", (req, res, next) =>
+route.get("/", (req, res) =>
 {
-	const token = req.body.token || req.query.token || req.headers["token"];
-	
-	if (!token)
+	const getDesarrollos = (desarrollos : Modelos.IDesarrolloInstance[]) =>
 	{
-		res.status(401).json(
-			{
-				message: "Unauthorized"
-			}
-		)
-		return;
-	}
-	Jwt.verify(token, config.secret, (err, decoded) =>
-	{
-		if (!err)
-		{
-			req.body.decodedToken = decoded;
-			next();
-			return;
-		}
-		if ((err as Jwt.TokenExpiredError) !== undefined)
-		{
-			res.status(401).json(
-				{
-					Mensaje: "Token expirado"
-				}
-			)
-			return;
-		}
-		res.status(401).json(
-			{
-				Mensaje: "Acceso no autorizado"
-			}
-		)
-	});
-});
-
-route.get("/", (req, res, next) =>
-{
-	const getDesarrollos = (desarrollo: IDesarrolloInstance[]) =>
-	{
-		let result = [];
 		res.status(200).json(
 			{
-				status: 200,
-				message: "OK",
-				desarrollos: desarrollo
+				status : 200,
+				message : "OK",
+				desarrollos : desarrollos
 			}
 		);
 	};
 	Modelos.Desarrollo.findAll().then(getDesarrollos);
 });
 
-route.post("/", (req, res) =>
+route.get("/:idSoftware", (req, res) =>
 {
+	const getDesarrollo = (software : Modelos.ISoftwareInstance) =>
+	{
+		if (!software)
+		{
+			return res.status(404).json(
+				{
+					mensaje : "No encontrado"
+				}
+			)
+		}
+		return res.status(200).json({
+			mensaje : "OK",
+			software : software
+		})
+	};
 
+	Modelos.Software.findOne(
+		{
+			where :
+				{
+					Clave_Software : req.params.idSoftware
+				}
+		}
+	).then(getDesarrollo);
 });
 
-route.delete("/", (req, res) =>
+privateRoute.post("/", (req, res) =>
 {
-	if (!req.body.idDesarrollo)
+	const parameters = req.body;
+	const decodedToken = req.body.decodedToken;
+
+	if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador")
 	{
-		return res.status(500).json(
+		return res.status(401).json(
 			{
-				message: "Desarrollo no existe"
+				mensaje : "Acceso no autorizado"
 			}
-		)
+		);
+	}
+
+	if (!parameters.Nombre && !parameters.Descripcion && !parameters.Estado && !parameters.Fecha_Inicio && !parameters.Fecha_Termino)
+	{
+		return res.status(400).json(
+			{
+				mensaje : "Faltan parametros para insertar usuario"
+			}
+		);
+	}
+
+	Modelos.Software.create(
+		{
+			Nombre : parameters.Nombre,
+			Descripcion : parameters.Descripcion,
+			Estado : parameters.Estado,
+			Fecha_Inicio : parameters.Fecha_Inicio,
+			Fecha_Termino : parameters.Fecha_Termino
+		}
+	).then((nuevoSoftware) =>
+	{
+		if (!nuevoSoftware)
+		{
+			return res.status(400).json(
+				{
+					mensaje : "No se puede insertar, checa los datos"
+				}
+			)
+		}
+		return res.status(201).json(
+			{
+				mensaje : "OK"
+			}
+		);
+	})
+});
+
+privateRoute.delete("/:idSoftware", (req, res) =>
+{
+	const decodedToken = req.body.decodedToken;
+	if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador")
+	{
+		return res.status(401).json(
+			{
+				mensaje : "Acceso no autorizado"
+			}
+		);
 	}
 });
 
-export {route as softwareRoute};
+privateRoute.put("/:idSoftware", (req, res) =>
+{
+	const parametros = req.body;
+	const decodedToken = req.body.decodedToken;
+	if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador")
+	{
+		return res.status(401).json(
+			{
+				mensaje : "Acceso no autorizado"
+			}
+		);
+	}
+
+	if (!parametros.Nombre || !parametros.Descripcion || !parametros.Estado || !parametros.Fecha_Termino)
+	{
+		return res.status(500).json(
+			{
+				mensaje : "No se brindaron parametros"
+			}
+		)
+	}
+
+	const editarDatos = (software : Modelos.ISoftwareInstance) =>
+	{
+		const nombre = parametros.Nombre || software.Nombre;
+		const descripcion = parametros.Descripcion || software.Descripcion;
+		const estado = parametros.Estado || software.Estado;
+		const fechaTermino = parametros.Fecha_Termino || software.Fecha_Termino;
+
+		Modelos.Software.update(
+			{
+				Nombre : nombre,
+				Descripcion : descripcion,
+				Estado : estado,
+				Fecha_Termino : fechaTermino
+			}
+		).then(softwareEditado =>
+		{
+			res.status(200).json(
+				{
+					mensaje : "OK"
+				}
+			)
+		}, error =>
+		{
+			res.status(500).json(
+				{
+					mensaje : "No se pudo editar"
+				}
+			)
+		});
+	};
+
+	Modelos.Software.findOne(
+		{
+			where :
+				{
+					Clave_Software : req.params.idSoftware
+				}
+		}
+	).then(softwareEncontrado =>
+	{
+		if (!softwareEncontrado)
+		{
+			res.status(500).json(
+				{
+					mensaje : "No es posible editar datos de un software que no existe"
+				}
+			);
+			return;
+		}
+		editarDatos(softwareEncontrado);
+	});
+});
+
+export {route as softwareRoute, privateRoute as privateSoftwareRoute};
