@@ -2,29 +2,30 @@ import {Sequelize, sequelize} from "./database";
 
 export interface ISoftwareAttributes
 {
-	ClaveSoftware: number,
-	Nombre: string,
-	Descripcion: Date,
-	Estado: string,
-	FechaInicio: Date,
-	FechaTermino: Date
+	Clave_Software?: number,
+	Nombre?: string,
+	Descripcion?: Date,
+	Estado?: string,
+	Fecha_Inicio?: Date,
+	Fecha_Termino?: Date
 }
 
 export interface ISoftwareInstance extends Sequelize.Instance<ISoftwareAttributes>
 {
-	ClaveSoftware: number,
-	Nombre: string,
-	Descripcion: Date,
-	Estado: string,
-	FechaInicio: Date,
-	FechaTermino: Date
+	Clave_Software?: number,
+	Nombre?: string,
+	Descripcion?: Date,
+	Estado?: string,
+	Fecha_Inicio?: Date,
+	Fecha_Termino?: Date
 }
 
 export const Software = sequelize.define<ISoftwareInstance, ISoftwareAttributes>("software", {
 	Clave_Software:
 		{
 			type: Sequelize.SMALLINT,
-			primaryKey: true
+			primaryKey: true,
+			autoIncrement: true
 		},
 	Nombre:
 		{
@@ -39,18 +40,18 @@ export const Software = sequelize.define<ISoftwareInstance, ISoftwareAttributes>
 
 export interface ICanceladosTardeAttributes
 {
-	ClaveCT: number,
-	Motivo: string,
-	FechaTenTermino: Date,
-	Software: number
+	Clave_CT?: number,
+	Motivo?: string,
+	Fecha_Ten_Termino?: Date,
+	Software?: number
 }
 
 export interface ICanceladosTardeInstance extends Sequelize.Instance<ICanceladosTardeAttributes>
 {
-	ClaveCT: number,
-	Motivo: string,
-	FechaTenTermino: Date,
-	Software: number
+	Clave_CT?: number,
+	Motivo?: string,
+	Fecha_Ten_Termino?: Date,
+	Software?: number
 }
 
 export const CanceladosTarde = sequelize.define<ICanceladosTardeInstance, ICanceladosTardeAttributes>("canceladosTarde",
@@ -72,29 +73,30 @@ Software.hasOne(CanceladosTarde, {foreignKey: "Software"});
 
 export interface IDesarrolloAttributes
 {
-	ClaveDesarrollo: Number,
-	Tarea: string,
-	FechaInicio: Date,
-	FechaTermino: Date,
-	Software: number,
-	Empleado: number
+	Clave_desarrollo?: Number,
+	Tarea?: string,
+	Fecha_Inicio?: Date,
+	Fecha_Termino?: Date,
+	Software?: number,
+	Empleado?: number
 }
 
 export interface IDesarrolloInstance extends Sequelize.Instance<IDesarrolloAttributes>
 {
-	ClaveDesarrollo: Number,
-	Tarea: string,
-	FechaInicio: Date,
-	FechaTermino: Date,
-	Software: number,
-	Empleado: number
+	Clave_desarrollo?: Number,
+	Tarea?: string,
+	Fecha_Inicio?: Date,
+	Fecha_Termino?: Date,
+	Software?: number,
+	Empleado?: number
 }
 
 export const Desarrollo = sequelize.define<IDesarrolloInstance, IDesarrolloAttributes>("desarrollo", {
 	Clave_desarrollo:
 		{
 			type: Sequelize.INTEGER,
-			primaryKey: true
+			primaryKey: true,
+			autoIncrement: true
 		},
 	Tarea: Sequelize.TEXT,
 	Fecha_Inicio: Sequelize.DATEONLY,
@@ -105,20 +107,20 @@ export const Desarrollo = sequelize.define<IDesarrolloInstance, IDesarrolloAttri
 
 export interface IEmpleadoAttributes
 {
-	Nomina: number,
-	GdoEstudios: string,
-	Nombre: string,
-	Apellidos: string,
-	Estatus: string
+	Nomina?: number,
+	Gdo_Estudios?: string,
+	Nombre?: string,
+	Apellidos?: string,
+	Estatus?: string
 }
 
 export interface IEmpleadoInstance extends Sequelize.Instance<IEmpleadoAttributes>
 {
-	Nomina: number,
-	GdoEstudios: string,
-	Nombre: string,
-	Apellidos: string,
-	Estatus: string
+	Nomina?: number,
+	Gdo_Estudios?: string,
+	Nombre?: string,
+	Apellidos?: string,
+	Estatus?: string
 }
 
 export const Empleado = sequelize.define<IEmpleadoInstance, IEmpleadoAttributes>("empleado", {
@@ -139,18 +141,18 @@ Software.hasMany(Desarrollo, {foreignKey: "Software"});
 
 export interface IPerfilesPasadosAttributes
 {
-	Clave: number,
-	Usuario: string,
-	Puesto: string,
-	Empleado: number
+	Clave?: number,
+	Usuario?: string,
+	Puesto?: string,
+	Empleado?: number
 }
 
 export interface IPerfilesPasadosInstance extends Sequelize.Instance<IPerfilesPasadosAttributes>
 {
-	Clave: number,
-	Usuario: string,
-	Puesto: string,
-	Empleado: number
+	Clave?: number,
+	Usuario?: string,
+	Puesto?: string,
+	Empleado?: number
 }
 
 export const PerfilesPasados = sequelize.define<IPerfilesPasadosInstance, IPerfilesPasadosAttributes>(
@@ -161,7 +163,7 @@ export const PerfilesPasados = sequelize.define<IPerfilesPasadosInstance, IPerfi
 				primaryKey: true
 			},
 		Usuario: Sequelize.STRING(15),
-		Puesto: Sequelize.ENUM("Gerente", "Desarrollador"),
+		Puesto: Sequelize.ENUM("RH", "Desarrollador", "Supervisor", "Administrador"),
 		Empleado: Sequelize.INTEGER
 	});
 
@@ -169,22 +171,22 @@ Empleado.hasMany(PerfilesPasados, {foreignKey: "Empleado"});
 
 export interface IPerfilAttributes
 {
-	ClaveEmpleado: number,
-	correo: string,
-	Usuario: string,
-	Contrasena: string,
-	Puesto: string,
-	Empleado: number
+	Clave_Empleado?: number,
+	Correo?: string,
+	Usuario?: string,
+	Contrasena?: string,
+	Puesto?: string,
+	Empleado?: number
 }
 
 export interface IPerfilInstance extends Sequelize.Instance<IPerfilAttributes>
 {
-	ClaveEmpleado: number,
-	correo: string,
-	Usuario: string,
-	Contrasena: string,
-	Puesto: string,
-	Empleado: number
+	Clave_Empleado?: number,
+	Correo?: string,
+	Usuario?: string,
+	Contrasena?: string,
+	Puesto?: string,
+	Empleado?: number
 }
 
 export const Perfil = sequelize.define<IPerfilInstance, IPerfilAttributes>("perfil", {
@@ -204,16 +206,16 @@ Empleado.hasOne(Perfil, {foreignKey: "Empleado"});
 
 export interface IImagenAttributes
 {
-	ClaveFoto?: number,
+	Clave_Foto?: number,
 	Direccion?: string,
 	Perfil?: number
 }
 
 export interface IImagenInstance extends Sequelize.Instance<IImagenAttributes>
 {
-	ClaveFoto: number,
-	Direccion: string,
-	Perfil: number
+	Clave_Foto?: number,
+	Direccion?: string,
+	Perfil?: number
 }
 
 export const Imagen = sequelize.define<IImagenInstance, IImagenAttributes>("imagenes", {
@@ -230,18 +232,18 @@ Perfil.hasMany(Imagen, {foreignKey: "Perfile"});
 
 export interface IEntradaSalidaAttributes
 {
-	ClaveRegistro: number,
-	Tipo: string,
-	Registro: Date,
-	Perfil: number
+	Clave_Registro?: number,
+	Tipo?: string,
+	Registro?: Date,
+	Perfil?: number
 }
 
 export interface IEntradaSalidaInstance extends Sequelize.Instance<IEntradaSalidaAttributes>
 {
-	ClaveRegistro: number,
-	Tipo: string,
-	Registro: Date,
-	Perfil: number
+	Clave_Registro?: number,
+	Tipo?: string,
+	Registro?: Date,
+	Perfil?: number
 }
 
 export const EntradaSalida = sequelize.define<IEntradaSalidaInstance, IEntradaSalidaAttributes>("entrada_salida", {
