@@ -27,7 +27,7 @@ route.use("/", (req, res, next) =>
 			next();
 			return;
 		}
-		if ((err as Jwt.TokenExpiredError) !== undefined)
+		if (err.name === "Jwt.TokenExpiredError")
 		{
 			res.status(401).json(
 				{
@@ -46,13 +46,13 @@ route.use("/", (req, res, next) =>
 
 route.get("/", (req, res) =>
 {
+	const decodedToken = req.body.decodedToken;
+	
 	// TODO Stark, ¿todos los empleados tienen permiso de ver quienes hacen que cosa en los desarrollos?
 	const getDesarrollos = (desarrollo: Modelos.IDesarrolloInstance[]) =>
 	{
-		let result = [];
 		res.status(200).json(
 			{
-				status: 200,
 				message: "OK",
 				desarrollos: desarrollo
 			}
@@ -61,9 +61,61 @@ route.get("/", (req, res) =>
 	Modelos.Desarrollo.findAll().then(getDesarrollos);
 });
 
+route.get("/:idDesarrollo", (req, res) =>
+{
+	const obtenerDesarrolloConId = (desarrollo: Modelos.IDesarrolloInstance) =>
+	{
+		return res.status(200).json(
+			{
+				mensaje: "OK",
+				desarrollo: desarrollo
+			}
+		)
+	}
+	Modelos.Desarrollo.findOne(
+		{
+			where:
+				{
+					Clave_desarrollo: req.params.idDesarrollo
+				}
+		}
+	).then(obtenerDesarrolloConId);
+});
+
 route.post("/", (req, res) =>
 {
 	// TODO añadir nuevos desarrollos, asegurar que solo un tipo de usuario especifico puede hacerlo
+	if (req.body.decodedToken.Puesto !== "Supervisor")
+	{
+		return res.status(401).json(
+			{
+				mensaje: "No tienes permiso de hacer esto"
+			}
+		)
+	}
+	
+	const desarrolloAInsertar = req.body.desarrollo;
+	
+	if (!desarrolloAInsertar)
+	{
+		return res.status(400).json(
+			{
+				mensaje: "Debes dar los datos para el nuevo desarrollo"
+			}
+		);
+	}
+	
+	Modelos.Desarrollo.create(
+		{
+			Clave_desarrollo: 10,
+			Tarea: desarrolloAInsertar.tarea,
+			Fecha_Inicio: desarrolloAInsertar.fechaInicio,
+			Fecha_Termino: desarrolloAInsertar.fechaTermino,
+			Software: desarrolloAInsertar.software, // son generados por el frontend
+			Empleado: desarrolloAInsertar.empleado
+		}
+	)
+
 });
 
 route.delete("/", (req, res) =>

@@ -8,6 +8,7 @@ const route = Express.Router();
 
 route.post("/login", (req, res) =>
 {
+	console.log(req);
 	const postData = req.body;
 	if (!postData.user || !postData.password)
 	{
@@ -47,7 +48,7 @@ route.post("/login", (req, res) =>
 			   const payload =
 				   {
 					   usuario: userFound.Usuario,
-					   correo: userFound.correo,
+					   correo: userFound.Correo,
 					   Puesto: userFound.Puesto
 				   };
 			   const token = Jwt.sign(payload, config.secret, {expiresIn: config.tokenLife});
@@ -132,13 +133,9 @@ route.post("/refreshToken", (req, res) =>
 											 }
 											 const token = Jwt.sign(payload, config.secret,
 																	{expiresIn: config.tokenLife});
-											 let date = new Date();
-											 date.setHours(date.getHours() + 1);
-											 console.log(date);
 											 Models.Tokens.update(
 												 {
-													 token: token,
-													 expiration: date
+													 token: token
 												 },
 												 {
 													 where:
