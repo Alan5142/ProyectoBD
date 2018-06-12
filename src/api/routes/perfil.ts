@@ -1,5 +1,6 @@
 import * as Express from "express";
 import * as Modelos from "../../utility/models";
+import { sequelize } from "../../utility/database";
 
 const route = Express.Router();
 
@@ -94,35 +95,33 @@ route.delete("/:idPerfil", (req, res) =>
 			}
 		)
 	}
-
-	Modelos.Perfil.destroy(
+	sequelize.query('DELETE p.*, f.* FROM Perfil as p INNER JOIN Fotos as f ON p.Clave_Empleado = f.Perfil WHERE p.Clave_Empleado = ?',
+	{
+		replacements: [req.params.idPerfil], type: sequelize.QueryTypes.DELETE
+	}).then(
+		exito =>
 		{
-			where :
+			return res.status(200).json(
 				{
-					idPerfil : req.params.idPerfil
+					mensaje: "OK"
 				}
+			)
+		},
+		error =>
+		{
+			return res.status(500).json(
+				{
+					mensaje: "Error en el servidor, no se pudo eliminar"
+				}
+			)
 		}
-	).then(pefilEliminado =>
-	{
-		res.json(200).json(
-			{
-				mensaje : "OK"
-			}
-		)
-	}, error =>
-	{
-		res.json(500).json(
-			{
-				mensaje : "No se pudo eliminar"
-			}
-		)
-	})
+	)
 });
 
 route.post("/", (req, res) =>
 {
 	const parameters = req.body;
-	const decodedToken = req.body.decodedToken; //Ay es post, no put, me confundi, sorry
+	const decodedToken = req.body.decodedToken;
 
 	if (decodedToken.Puesto !== "Administrador" || decodedToken.Puesto !== "RRHH")
 	{

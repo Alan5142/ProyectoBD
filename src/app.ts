@@ -1,6 +1,5 @@
 "use strict";
 
-
 import * as Express from "express";
 import * as Jwt from "jsonwebtoken";
 // rutas
@@ -12,6 +11,7 @@ import {privateSoftwareRoute, softwareRoute} from "./api/routes/software";
 import {empleadoRoute} from "./api/routes/empleado";
 import {perfilRoute} from "./api/routes/perfil";
 import {entradaSalidaRoute} from "./api/routes/entrada_salida";
+import {fotosRoute} from "./api/routes/fotos";
 
 const config = require("./../config.json");
 const app = Express();
@@ -85,6 +85,8 @@ app.use("/api/private/empleado", empleadoRoute);
 app.use("/api/private/perfil", perfilRoute);
 
 app.use("/api/private/entrada_salida", entradaSalidaRoute);
+
+app.use("/api/private/fotos", fotosRoute);
 
 app.listen(port, host, () =>
 {
