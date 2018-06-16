@@ -18,8 +18,13 @@ const app = Express();
 const port = 5050;
 const host = "0.0.0.0";
 const bodyParser = require("body-parser");
+const cors = require('cors')
+
 app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
+
+app.use(cors());
+
 
 app.get("/", (req, res) =>
 {

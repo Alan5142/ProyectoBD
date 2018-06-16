@@ -1,6 +1,6 @@
 {
 	"secret": "Clave super secreta que solo sabemos stark y yo",
 	"refreshTokenSecret": "Clave super secreta para cuando se refresca un token",
-	"tokenLife": "1h",
+  "tokenLife": "2h",
 	"refreshTokenLife": "1d"
 }

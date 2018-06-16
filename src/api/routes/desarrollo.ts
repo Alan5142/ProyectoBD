@@ -14,7 +14,6 @@ route.get("/", (req, res) =>
 			}
 		);
 	}
-	// TODO Stark, ¿todos los empleados tienen permiso de ver quienes hacen que cosa en los desarrollos?
 	const getDesarrollos = (desarrollo : Modelos.IDesarrolloInstance[]) =>
 	{
 		res.status(200).json(
@@ -27,7 +26,40 @@ route.get("/", (req, res) =>
 	Modelos.Desarrollo.findAll().then(getDesarrollos);
 });
 
-route.get("/:idDesarrollo", (req, res) =>
+route.get("/empleado/:idEmpleado", (req, res) =>
+{
+	const decodedToken = req.body.decodedToken;
+	if (decodedToken.Puesto !== "Administrador" && decodedToken.Puesto !== "RRHH" && (decodedToken.Puesto !== "Desarrollador" && decodedToken.numUsuario !== req.params.nomina))
+	{
+		return res.status(401).json(
+			{
+				mensaje : "Acceso no autorizado"
+			}
+		);
+	}
+	const getDesarrollos = (desarrollo : any) =>
+	{
+		console.log(desarrollo[1].desarrollos[0]);
+		res.status(200).json(
+			{
+				mensaje : "OK",
+				desarrollos : desarrollo
+			}
+		);
+	};
+	Modelos.Software.findAll({
+		attributes : ['Fecha_Inicio', 'Fecha_Termino', 'Nombre', 'Descripcion', 'Estado'],
+		include : [
+			{
+				attributes : ['Tarea'],
+				model : Modelos.Desarrollo,
+				required : true,
+				where : {Empleado : req.params.idEmpleado}
+			}]
+	}).then(getDesarrollos);
+});
+
+route.get("/buscar/:idDesarrollo", (req, res) =>
 {
 	const decodedToken = req.body.decodedToken;
 

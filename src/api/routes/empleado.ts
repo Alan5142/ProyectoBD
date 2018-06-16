@@ -39,7 +39,7 @@ route.get("/", (req, res) =>
 route.get("/:nomina", (req, res) =>
 {
 	const decodedToken = req.body.decodedToken;
-	if (decodedToken.Puesto !== "Administrador" || decodedToken.Puesto !== "RRHH" || (decodedToken.Puesto !== "Desarrollador" && decodedToken.numUsuario !== req.params.nomina))
+	if (!(decodedToken.Puesto !== "Administrador" || decodedToken.Puesto !== "RRHH") && (decodedToken.Puesto !== "Desarrollador" && decodedToken.numUsuario !== req.params.nomina))
 	{
 		return res.status(401).json(
 			{

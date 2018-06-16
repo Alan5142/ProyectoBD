@@ -1,25 +1,57 @@
 import * as Express from "express";
 import * as Modelos from "../../utility/models";
+import {Sequelize} from "../../utility/database";
 
 const route = Express.Router();
 const privateRoute = Express.Router();
 
+route.get("/buscar/:nombre", (req, res) =>
+{
+	const nombre = req.params.nombre;
+	const getSoftwares = (softwares : Modelos.ISoftwareInstance[]) =>
+	{
+		if (!softwares)
+		{
+			return res.status(500).json(
+				{
+					mensaje : 'Error al buscar'
+				}
+			)
+		}
+		res.status(200).json(
+			{
+				mensaje : "OK",
+				softwares : softwares
+			}
+		);
+	};
+	Modelos.Software.findAll({
+		where :
+			{
+				Nombre :
+					{
+						[Sequelize.Op.like] : '%' + nombre + '%'
+					}
+			}
+	}).then(getSoftwares);
+});
+
+
 route.get("/", (req, res) =>
 {
-	const getDesarrollos = (desarrollos : Modelos.IDesarrolloInstance[]) =>
+	const getSoftwares = (desarrollos : Modelos.ISoftwareInstance[]) =>
 	{
 		res.status(200).json(
 			{
-				status : 200,
 				message : "OK",
 				desarrollos : desarrollos
 			}
 		);
 	};
-	Modelos.Desarrollo.findAll().then(getDesarrollos);
+	Modelos.Software.findAll().then(getSoftwares);
 });
 
-route.get("/:idSoftware", (req, res) =>
+route.get("/info/:idSoftware", (req, res) =>
 {
 	const getDesarrollo = (software : Modelos.ISoftwareInstance) =>
 	{

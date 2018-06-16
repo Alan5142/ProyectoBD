@@ -34,13 +34,12 @@ route.post("/login", (req, res) =>
 		}
 	).then(userFound =>
 		{
-			if (!user)
+			if (!userFound)
 			{
 				res.statusCode = 400;
 				res.json(
 					{
-						status : 400,
-						"Mensaje" : "Error al autenticar"
+						"mensaje" : "Error al autenticar"
 					}
 				);
 				return;
@@ -67,8 +66,8 @@ route.post("/login", (req, res) =>
 
 			res.json(
 				{
-					status : 200,
-					"Mensaje" : "Exito al autenticar",
+					"mensaje" : "Exito al autenticar",
+					numUsuario : userFound.Clave_Empleado,
 					"usuario" : userFound.Usuario,
 					"puesto" : userFound.Puesto,
 					"token" : token,
@@ -131,8 +130,7 @@ route.post("/refreshToken", (req, res) =>
 						{
 							return res.status(401).json({error : true, message : "Unauthorized access."});
 						}
-						const token = Jwt.sign(payload, config.secret,
-							{expiresIn : config.tokenLife});
+						const token = Jwt.sign(payload, config.secret, {expiresIn : config.tokenLife});
 						Models.Tokens.update(
 							{
 								token : token
@@ -167,5 +165,25 @@ route.post("/refreshToken", (req, res) =>
 	});
 
 });
+
+route.get('/decode/:token', (req, res) =>
+{
+	Jwt.verify(req.params.token, config.secret,
+		function (err, decoded)
+		{
+			if (err)
+			{
+				return res.status(401).json({error : true, message : "Token invalido"});
+			}
+			return res.status(200).json(
+				{
+					num_usuario : decoded.numUsuario,
+					usuario : decoded.usuario,
+					correo : decoded.correo,
+					puesto : decoded.Puesto,
+				}
+			);
+		});
+})
 
 export {route as loginRoute};
