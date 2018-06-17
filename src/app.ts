@@ -9,7 +9,7 @@ import {canceladosTardeRoute} from "./api/routes/cancelados_tarde";
 import {perfilesPasadosRoute} from "./api/routes/perfiles_pasados";
 import {privateSoftwareRoute, softwareRoute} from "./api/routes/software";
 import {empleadoRoute} from "./api/routes/empleado";
-import {perfilRoute} from "./api/routes/perfil";
+import {perfilRoute, publicPerfilRoute} from "./api/routes/perfil";
 import {entradaSalidaRoute} from "./api/routes/entrada_salida";
 import {fotosRoute} from "./api/routes/fotos";
 
@@ -86,6 +86,8 @@ app.use("/api/private/cancelados_tarde", canceladosTardeRoute);
 app.use("/api/private/perfilesPasados", perfilesPasadosRoute);
 
 app.use("/api/private/empleado", empleadoRoute);
+
+app.use('/api/perfil', publicPerfilRoute);
 
 app.use("/api/private/perfil", perfilRoute);
 

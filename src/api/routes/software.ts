@@ -84,7 +84,7 @@ privateRoute.post("/", (req, res) =>
 	const parameters = req.body;
 	const decodedToken = req.body.decodedToken;
 
-	if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador")
+	if (decodedToken.Puesto !== "Supervisor" && decodedToken.Puesto !== "Administrador")
 	{
 		return res.status(401).json(
 			{
@@ -93,7 +93,7 @@ privateRoute.post("/", (req, res) =>
 		);
 	}
 
-	if (!parameters.Nombre && !parameters.Descripcion && !parameters.Estado && !parameters.Fecha_Inicio && !parameters.Fecha_Termino)
+	if (!parameters.Nombre || !parameters.Descripcion || !parameters.Fecha_Inicio || !parameters.Fecha_Termino)
 	{
 		return res.status(400).json(
 			{
@@ -106,7 +106,7 @@ privateRoute.post("/", (req, res) =>
 		{
 			Nombre : parameters.Nombre,
 			Descripcion : parameters.Descripcion,
-			Estado : parameters.Estado,
+			Estado : 'En_proceso',
 			Fecha_Inicio : parameters.Fecha_Inicio,
 			Fecha_Termino : parameters.Fecha_Termino
 		}

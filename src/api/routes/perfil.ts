@@ -1,10 +1,10 @@
 import * as Express from "express";
 import * as Modelos from "../../utility/models";
-import { sequelize } from "../../utility/database";
 
 const route = Express.Router();
+const publicRoute = Express.Router();
 
-route.get("/", (req, res) =>
+publicRoute.get("/", (req, res) =>
 	{
 
 		const buscarPerfiles = (perfiles : Modelos.IPerfilInstance[]) =>
@@ -78,7 +78,7 @@ route.get("/:idPerfil", (req, res) =>
 route.delete("/:idPerfil", (req, res) =>
 {
 
-	if (req.body.decodedToken.Puesto !== "Administrador" || req.body.decodedToken.puesto !== "RRHH")
+	if (req.body.decodedToken.Puesto !== "Administrador" && req.body.decodedToken.puesto !== "RRHH")
 	{
 		return res.status(401).json(
 			{
@@ -95,11 +95,14 @@ route.delete("/:idPerfil", (req, res) =>
 			}
 		)
 	}
-	sequelize.query('DELETE p.*, f.* FROM Perfil as p INNER JOIN Fotos as f ON p.Clave_Empleado = f.Perfil WHERE p.Clave_Empleado = ?',
-	{
-		replacements: [req.params.idPerfil], type: sequelize.QueryTypes.DELETE
-	}).then(
-		exito =>
+	Modelos.Perfil.destroy(
+		{
+			where :
+				{
+					Clave_Empleado : req.params.idPerfil
+				}
+		}
+	).then(exito =>
 		{
 			return res.status(200).json(
 				{
@@ -109,6 +112,7 @@ route.delete("/:idPerfil", (req, res) =>
 		},
 		error =>
 		{
+			console.log(error);
 			return res.status(500).json(
 				{
 					mensaje: "Error en el servidor, no se pudo eliminar"
@@ -123,7 +127,7 @@ route.post("/", (req, res) =>
 	const parameters = req.body;
 	const decodedToken = req.body.decodedToken;
 
-	if (decodedToken.Puesto !== "Administrador" || decodedToken.Puesto !== "RRHH")
+	if (decodedToken.Puesto !== "Administrador" && decodedToken.Puesto !== "RRHH")
 	{
 		return res.status(401).json(
 			{
@@ -132,7 +136,7 @@ route.post("/", (req, res) =>
 		);
 	}
 
-	if (!parameters.Correo && !parameters.Usuario && !parameters.Contrasena && !parameters.Puesto && !parameters.Empleado)
+	if (!parameters.Correo || !parameters.Usuario || !parameters.Contrasena || !parameters.Puesto || !parameters.Empleado)
 	{
 		return res.status(400).json(
 			{
@@ -143,6 +147,7 @@ route.post("/", (req, res) =>
 
 	Modelos.Perfil.create(
 		{
+			Clave_Empleado : parameters.Empleado,
 			Correo : parameters.Correo,
 			Usuario : parameters.Usuario,
 			Contrasena : parameters.Contrasena,
@@ -187,8 +192,8 @@ route.put("/:idPerfil", (req, res) =>
 
 		const editarDatos = (perfil : Modelos.IPerfilInstance) =>
 		{
-			const usuario = parametros.Nombre || perfil.Usuario;
-			const contrasena = parametros.Estatus || perfil.Contrasena;
+			const usuario = parametros.Nombre ? parametros.Nombre : perfil.Usuario;
+			const contrasena = parametros.Estatus ? parametros.Estatus : perfil.Contrasena;
 
 			Modelos.Perfil.update(
 				{
@@ -239,7 +244,7 @@ route.put("/:idPerfil", (req, res) =>
 
 	const editaAdministrador = () =>
 	{
-		if (!parametros.Usuario || !parametros.Contrasena || !parametros.Puesto || !parametros.Correo)
+		if (!parametros.Usuario && !parametros.Contrasena && !parametros.Puesto && !parametros.Correo)
 		{
 			res.status(500).json(
 				{
@@ -251,16 +256,22 @@ route.put("/:idPerfil", (req, res) =>
 
 		const editarDatos = (perfil : Modelos.IPerfilInstance) =>
 		{
-			const usuario = parametros.Nombre || perfil.Usuario;
-			const contrasena = parametros.Estatus || perfil.Contrasena;
-			const puesto = parametros.Puesto || perfil.Puesto;
-			const correo = parametros.Correo || perfil.Correo;
+			const usuario = parametros.Nombre ? parametros.Nombre : perfil.Usuario;
+			const contrasena = parametros.Contrasena ? parametros.Contrasena : perfil.Contrasena;
+			const puesto = parametros.Puesto ? parametros.Puesto : perfil.Puesto;
+			const correo = parametros.Correo ? parametros.Correo : perfil.Correo;
 			Modelos.Perfil.update(
 				{
 					Usuario : usuario,
 					Contrasena : contrasena,
 					Puesto : puesto,
 					Correo : correo
+				},
+				{
+					where :
+						{
+							Clave_Empleado : req.params.idPerfil
+						}
 				}
 			).then(perfilEditado =>
 			{
@@ -297,6 +308,7 @@ route.put("/:idPerfil", (req, res) =>
 				);
 				return;
 			}
+			editarDatos(perfilEncontrado);
 		})
 	};
 
@@ -315,7 +327,7 @@ route.put("/:idPerfil", (req, res) =>
 
 		const editarDatos = (perfil : Modelos.IPerfilInstance) =>
 		{
-			const puesto = parametros.Puesto || perfil.Puesto;
+			const puesto = parametros.Puesto ? parametros.Puesto : perfil.Puesto;
 
 			Modelos.Perfil.update(
 				{
@@ -380,4 +392,4 @@ route.put("/:idPerfil", (req, res) =>
 	}
 });
 
-export {route as perfilRoute}
+export {route as perfilRoute, publicRoute as publicPerfilRoute}

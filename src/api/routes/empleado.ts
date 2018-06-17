@@ -199,7 +199,7 @@ route.post("/", (req, res) =>
 	const decodedToken = req.body.decodedToken;
 	const parameters = req.body;
 
-	if (decodedToken.Puesto !== "RRHH" || decodedToken.Puesto !== "Administrador")
+	if (decodedToken.Puesto !== "RRHH" && decodedToken.Puesto !== "Administrador")
 	{
 		return res.status(401).json(
 			{
@@ -222,7 +222,7 @@ route.post("/", (req, res) =>
 			Gdo_Estudios : parameters.Gdo_Estudios,
 			Nombre : parameters.Nombre,
 			Apellidos : parameters.Apellidos,
-			Estatus : parameters.Estatus
+			Estatus : 'Activo'
 		}
 	).then((nuevoEmplead) =>
 	{
@@ -236,7 +236,8 @@ route.post("/", (req, res) =>
 		}
 		return res.status(201).json(
 			{
-				mensaje : "OK"
+				mensaje : "OK",
+				nomina : nuevoEmplead.Nomina
 			}
 		);
 	})

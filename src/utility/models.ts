@@ -229,7 +229,7 @@ export const Imagen = sequelize.define<IImagenInstance, IImagenAttributes>("imag
 	Perfil : Sequelize.INTEGER
 });
 
-Perfil.hasMany(Imagen, {foreignKey : "Perfil"});
+Perfil.hasMany(Imagen, {foreignKey : "Perfil", onDelete : 'cascade'});
 
 export interface IEntradaSalidaAttributes
 {
