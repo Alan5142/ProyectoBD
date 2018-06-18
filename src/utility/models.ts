@@ -163,7 +163,7 @@ export const PerfilesPasados = sequelize.define<IPerfilesPasadosInstance, IPerfi
 				primaryKey : true
 			},
 		Usuario : Sequelize.STRING(15),
-		Puesto : Sequelize.ENUM("RRHH", "Desarrollador", "Supervisor", "Administrador"),
+		puesto : Sequelize.ENUM("RRHH", "Desarrollador", "Supervisor", "Administrador"),
 		Empleado : Sequelize.INTEGER
 	});
 

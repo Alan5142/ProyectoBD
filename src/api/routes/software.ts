@@ -145,7 +145,7 @@ privateRoute.put("/:idSoftware", (req, res) =>
 {
 	const parametros = req.body;
 	const decodedToken = req.body.decodedToken;
-	if (decodedToken.Puesto !== "Supervisor" || decodedToken.Puesto !== "Administrador")
+	if (decodedToken.Puesto !== "Supervisor" && decodedToken.Puesto !== "Administrador")
 	{
 		return res.status(401).json(
 			{
@@ -154,7 +154,7 @@ privateRoute.put("/:idSoftware", (req, res) =>
 		);
 	}
 
-	if (!parametros.Nombre || !parametros.Descripcion || !parametros.Estado || !parametros.Fecha_Termino)
+	if (!parametros.Nombre && !parametros.Descripcion && !parametros.Estado && !parametros.Fecha_Termino)
 	{
 		return res.status(500).json(
 			{
@@ -165,10 +165,10 @@ privateRoute.put("/:idSoftware", (req, res) =>
 
 	const editarDatos = (software : Modelos.ISoftwareInstance) =>
 	{
-		const nombre = parametros.Nombre || software.Nombre;
-		const descripcion = parametros.Descripcion || software.Descripcion;
-		const estado = parametros.Estado || software.Estado;
-		const fechaTermino = parametros.Fecha_Termino || software.Fecha_Termino;
+		const nombre = parametros.Nombre ? parametros.Nombre : software.Nombre;
+		const descripcion = parametros.Descripcion ? parametros.Descripcion : software.Descripcion;
+		const estado = parametros.Estado ? parametros.Estado : software.Estado;
+		const fechaTermino = parametros.Fecha_Termino ? parametros.Fecha_Termino : software.Fecha_Termino;
 
 		Modelos.Software.update(
 			{
@@ -176,9 +176,17 @@ privateRoute.put("/:idSoftware", (req, res) =>
 				Descripcion : descripcion,
 				Estado : estado,
 				Fecha_Termino : fechaTermino
+			},
+
+			{
+				where :
+					{
+						Clave_Software : req.params.idSoftware
+					}
 			}
 		).then(softwareEditado =>
 		{
+			console.log(softwareEditado);
 			res.status(200).json(
 				{
 					mensaje : "OK"

@@ -12,6 +12,7 @@ import {empleadoRoute} from "./api/routes/empleado";
 import {perfilRoute, publicPerfilRoute} from "./api/routes/perfil";
 import {entradaSalidaRoute} from "./api/routes/entrada_salida";
 import {fotosRoute} from "./api/routes/fotos";
+import * as Path from 'path';
 
 const config = require("./../config.json");
 const app = Express();
@@ -73,6 +74,11 @@ app.use("/api/private", (req, res, next) =>
 			}
 		)
 	});
+});
+
+app.use('/api/fotoPerfil/:idUsuario', (req, res) =>
+{
+	return res.sendFile(Path.resolve('.') + '/uploads/pictures/' + req.params.idUsuario + '/perfil.jpg');
 });
 
 app.use("/api/private/desarrollo", desarrolloRoute);

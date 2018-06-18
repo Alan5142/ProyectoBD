@@ -6,7 +6,7 @@ const route = Express.Router();
 route.get("/", (req, res) =>
 	{
 		const decodedToken = req.body.decodedToken;
-		if (decodedToken.Puesto !== "Administrador" || decodedToken.Puesto !== "RRHH")
+		if (decodedToken.Puesto !== "Administrador" && decodedToken.Puesto !== "RRHH")
 		{
 			return res.status(401).json(
 				{
@@ -126,7 +126,7 @@ route.put("/:nomina", (req, res) =>
 {
 	const decodedToken = req.body.decodedToken;
 	const parametros = req.body;
-	if (decodedToken.Puesto !== "RRHH" || decodedToken.Puesto !== "Administrador")
+	if (decodedToken.Puesto !== "RRHH" && decodedToken.Puesto !== "Administrador")
 	{
 		return res.status(401).json(
 			{
@@ -146,14 +146,20 @@ route.put("/:nomina", (req, res) =>
 
 	const editarDatos = (empleado : Modelos.IEmpleadoInstance) =>
 	{
-		const Gdo_Estudios = parametros.Nombre || empleado.Gdo_Estudios;
-		const estatus = parametros.Estatus || empleado.Estatus;
+		const Gdo_Estudios = parametros.Gdo_Estudios ? parametros.Gdo_Estudios : empleado.Gdo_Estudios;
+		const estatus = parametros.Estatus === null || parametros.Estatus === '' ? parametros.Estatus : empleado.Estatus;
 
 
 		Modelos.Empleado.update(
 			{
 				Gdo_Estudios : Gdo_Estudios,
 				Estatus : estatus
+			},
+			{
+				where :
+					{
+						Nomina : req.params.nomina
+					}
 			}
 		).then(empleadoEditado =>
 		{

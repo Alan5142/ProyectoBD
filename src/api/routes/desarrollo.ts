@@ -39,7 +39,6 @@ route.get("/empleado/:idEmpleado", (req, res) =>
 	}
 	const getDesarrollos = (desarrollo : any) =>
 	{
-		console.log(desarrollo[1].desarrollos[0]);
 		res.status(200).json(
 			{
 				mensaje : "OK",
@@ -101,8 +100,8 @@ route.get("/buscar/:idDesarrollo", (req, res) =>
 
 route.post("/", (req, res) =>
 {
-	// TODO añadir nuevos desarrollos, asegurar que solo un tipo de usuario especifico puede hacerlo
-	if (req.body.decodedToken.Puesto !== "Supervisor")
+	const decodedToken = req.body.decodedToken;
+	if (decodedToken.Puesto !== "Supervisor" && decodedToken.Puesto !== "Administrador")
 	{
 		return res.status(401).json(
 			{
@@ -124,14 +123,19 @@ route.post("/", (req, res) =>
 
 	Modelos.Desarrollo.create(
 		{
-			Clave_desarrollo : 10,
 			Tarea : desarrolloAInsertar.tarea,
 			Fecha_Inicio : desarrolloAInsertar.fechaInicio,
 			Fecha_Termino : desarrolloAInsertar.fechaTermino,
 			Software : desarrolloAInsertar.software, // son generados por el frontend
-			Empleado : desarrolloAInsertar.empleado
+			Empleado : desarrolloAInsertar.noEmpleado
 		}
-	)
+	).then(sucess =>
+	{
+		res.status(201).json("OK")
+	}, error =>
+	{
+		res.status(500).json("Error al crear tarea")
+	})
 
 });
 
